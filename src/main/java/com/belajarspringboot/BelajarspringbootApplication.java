@@ -1,4 +1,4 @@
-package com.belajarspringboot.belajarspringboot;
+package com.belajarspringboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
