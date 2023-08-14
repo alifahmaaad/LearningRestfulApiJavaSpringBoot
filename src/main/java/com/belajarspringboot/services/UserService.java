@@ -16,4 +16,7 @@ public class UserService {
     public User Tambah(User user){
         return userRepo.save(user);
     }
+    public User findbyEmail(String email){
+        return userRepo.findByEmail(email);
+    }
 }
