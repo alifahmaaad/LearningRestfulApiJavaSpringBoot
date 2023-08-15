@@ -10,6 +10,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,5 +67,25 @@ public class UserController {
             datausers.add(datauser);
         }
         return ResponseEntity.ok(datausers);
+    }
+    @PutMapping("/update")
+    public ResponseEntity<ResponseData<User>> updateUser(@RequestBody User user){
+        User getUserById= userService.findById(user.getId());
+        ResponseData<User> dataResponse = new ResponseData<>();
+        dataResponse.setStatus(false);
+        dataResponse.setPayload(null);
+        if(getUserById!=null){
+            try {
+                User UpdatedUser = userService.updateUser(user);
+                dataResponse.setPayload(userService.updateUser(UpdatedUser));
+                dataResponse.setStatus(true);
+                dataResponse.getMessages().add("berhasil");
+                return ResponseEntity.ok(dataResponse);
+            } catch (Exception e) {
+                dataResponse.getMessages().add(e.getMessage());
+            }
+        }
+        dataResponse.getMessages().add("gagal");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dataResponse);
     }
 }

@@ -22,4 +22,10 @@ public class UserService {
     public Iterable<User> getAllUser(){
         return userRepo.findAll();
     }
+    public User updateUser(User user){
+        return userRepo.save(user);
+    }
+    public User findById(Long id){
+        return userRepo.findById(id).get();
+    }
 }

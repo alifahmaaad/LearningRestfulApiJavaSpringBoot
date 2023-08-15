@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class DataUserWithoutPass {
-    private Integer id;
+    private Long id;
     private String nama;
     private String email;
 }
