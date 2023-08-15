@@ -19,7 +19,7 @@ public class User implements Serializable{
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @NotEmpty(message = "nama is required")
     private String nama;
     @NotEmpty(message = "password is required")

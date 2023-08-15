@@ -13,10 +13,22 @@ import jakarta.transaction.Transactional;
 public class UserService {
     @Autowired
     private UserRepo userRepo;
-    public User Tambah(User user){
+    public User register(User user){
         return userRepo.save(user);
     }
     public User findbyEmail(String email){
         return userRepo.findByEmail(email);
+    }
+    public Iterable<User> getAllUser(){
+        return userRepo.findAll();
+    }
+    public User updateUser(User user){
+        return userRepo.save(user);
+    }
+    public User findById(Long id){
+        return userRepo.findById(id).get();
+    }
+    public void deleteUser(Long id){
+        userRepo.deleteById(id);
     }
 }
