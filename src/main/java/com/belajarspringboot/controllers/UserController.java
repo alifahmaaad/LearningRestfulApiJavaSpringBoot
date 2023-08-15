@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,6 +68,23 @@ public class UserController {
             datausers.add(datauser);
         }
         return ResponseEntity.ok(datausers);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseData<User>> getUserById(@PathVariable Long id){
+        ResponseData<User> dataResponse = new ResponseData<>();
+        dataResponse.setPayload(null);
+        dataResponse.setStatus(false);
+        try {
+            User dataUser = userService.findById(id);
+            dataResponse.setPayload(dataUser);
+            dataResponse.setStatus(true);
+            dataResponse.getMessages().add("berhasil");
+            return ResponseEntity.ok(dataResponse);
+        } catch (Exception e) {
+            dataResponse.getMessages().add(e.getMessage());
+        }
+        dataResponse.getMessages().add("gagal");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dataResponse);
     }
     @PutMapping("/update")
     public ResponseEntity<ResponseData<User>> updateUser(@RequestBody User user){
