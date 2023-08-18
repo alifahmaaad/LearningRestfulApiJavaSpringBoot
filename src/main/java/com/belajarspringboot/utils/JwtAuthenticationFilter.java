@@ -21,10 +21,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
     @Autowired
     private JwtUtil jwtUtil;
-     @Autowired
+    @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
      private AuthenticationManager authenticationManager;
+     
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
