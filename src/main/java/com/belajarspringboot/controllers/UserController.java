@@ -6,6 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,12 +21,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.belajarspringboot.dto.DataUserWithoutPass;
+import com.belajarspringboot.dto.LoginDto;
 import com.belajarspringboot.dto.ResponseData;
 import com.belajarspringboot.models.entities.User;
+import com.belajarspringboot.security.CustomUserDetailsService;
 import com.belajarspringboot.services.UserService;
+import com.belajarspringboot.utils.JwtUtil;
 
 import jakarta.validation.Valid;
 
@@ -29,7 +39,35 @@ import jakarta.validation.Valid;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+     private AuthenticationManager authenticationManager;
+     @Autowired
+     private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
+    @PostMapping("/login")
+    public ResponseEntity<ResponseData<String>> login(@RequestBody LoginDto logindto){
+    ResponseData<String> dataResponse=new ResponseData<>();
+        dataResponse.setStatus(false);
+        dataResponse.setPayload(null);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(logindto.getEmail(), logindto.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(logindto.getEmail());
+            String token = jwtUtil.generateToken(userDetails);
+            dataResponse.setStatus(true);
+            dataResponse.setPayload(token);
+            dataResponse.getMessages().add(" berhasil digenerate");
+            return ResponseEntity.ok(dataResponse);
+        } catch (AuthenticationException e) {
+            dataResponse.getMessages().add(" gagal digenerate");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(dataResponse);
+        }
+
+    }
     @PostMapping("/register")
     public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody User user, Errors errs){
         ResponseData<User> dataResponse=new ResponseData<>();

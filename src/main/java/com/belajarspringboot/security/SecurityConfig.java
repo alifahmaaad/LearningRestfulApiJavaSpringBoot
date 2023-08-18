@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.belajarspringboot.models.repos.RoleRepo;
 import com.belajarspringboot.utils.JwtAuthenticationFilter;
 
 @Configuration
