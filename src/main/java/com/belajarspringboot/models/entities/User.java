@@ -3,6 +3,8 @@ package com.belajarspringboot.models.entities;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,8 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,12 +29,9 @@ public class User implements Serializable{
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotEmpty(message = "nama is required")
     private String nama;
-    @NotEmpty(message = "password is required")
+    @JsonIgnore
     private String password;
-    @NotEmpty(message = "email is required")
-    @Email(message = "email not valid")
     @Column(name = "email",unique = true)
     private String email;
     
