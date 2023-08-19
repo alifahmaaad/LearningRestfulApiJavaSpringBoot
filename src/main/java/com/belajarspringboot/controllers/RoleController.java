@@ -29,7 +29,6 @@ public class RoleController {
         } catch (Exception e) {
             dataResponse.getMessages().add(e.getMessage());
             return ResponseEntity.badRequest().body(dataResponse);
-            // TODO: handle exception
         }
 
     }

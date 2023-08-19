@@ -3,6 +3,7 @@ package com.belajarspringboot.models.entities;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.belajarspringboot.enums.RoleEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -30,7 +31,7 @@ public class Role implements Serializable{
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    private String name;
+    private RoleEnum name;
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
