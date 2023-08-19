@@ -1,7 +1,7 @@
 package com.belajarspringboot.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.belajarspringboot.dto.DataUserWithoutPass;
 import com.belajarspringboot.dto.LoginDto;
 import com.belajarspringboot.dto.ResponseData;
+import com.belajarspringboot.dto.UserDto;
+import com.belajarspringboot.models.entities.Role;
 import com.belajarspringboot.models.entities.User;
 import com.belajarspringboot.security.CustomUserDetailsService;
+import com.belajarspringboot.services.RoleService;
 import com.belajarspringboot.services.UserService;
 import com.belajarspringboot.utils.JwtUtil;
 
@@ -38,6 +39,8 @@ import jakarta.validation.Valid;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleService roleService;
     @Autowired
      private AuthenticationManager authenticationManager;
      @Autowired
@@ -68,8 +71,9 @@ public class UserController {
 
     }
     @PostMapping("/register")
-    public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody User user, Errors errs){
+    public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody UserDto user, Errors errs){
         ResponseData<User> dataResponse=new ResponseData<>();
+        User registerUser = new User();
         dataResponse.setStatus(false);
          dataResponse.setPayload(null);
         if(userService.findbyEmail(user.getEmail()) != null){
@@ -83,7 +87,18 @@ public class UserController {
          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dataResponse);
         }
         try {
-            User savedUser=userService.register(user);
+            registerUser.setEmail(user.getEmail());
+            registerUser.setNama(user.getNama());
+            registerUser.setPassword(user.getPassword());
+            Set<Role> newRoles = new HashSet<>();
+            for (String roleName : user.getRoles()) {
+                Role existingRole = roleService.findByName(roleName);
+                if (existingRole != null) {
+                  newRoles.add(existingRole);
+                }
+            }
+            registerUser.setRoles(newRoles);
+            User savedUser=userService.register(registerUser);
             dataResponse.setStatus((true));
             dataResponse.setPayload(savedUser);
             dataResponse.getMessages().add("berhasil");
@@ -95,17 +110,9 @@ public class UserController {
        
     }
     @GetMapping
-    public ResponseEntity<List<DataUserWithoutPass>> getAllUser(){
-        DataUserWithoutPass datauser = new DataUserWithoutPass();
-        List<DataUserWithoutPass> datausers = new ArrayList<DataUserWithoutPass>();
+    public ResponseEntity<Iterable<User>> getAllUser(){
         Iterable<User> users = userService.getAllUser();
-        for (User user : users) {
-            datauser.setId(user.getId());
-            datauser.setNama(user.getNama());
-            datauser.setEmail(user.getEmail());
-            datausers.add(datauser);
-        }
-        return ResponseEntity.ok(datausers);
+        return ResponseEntity.ok(users);
     }
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<User>> getUserById(@PathVariable Long id){
@@ -125,14 +132,27 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dataResponse);
     }
     @PutMapping("/update")
-    public ResponseEntity<ResponseData<User>> updateUser(@RequestBody User user){
+    public ResponseEntity<ResponseData<User>> updateUser(@RequestBody UserDto user){
         User getUserById= userService.findById(user.getId());
         ResponseData<User> dataResponse = new ResponseData<>();
         dataResponse.setStatus(false);
         dataResponse.setPayload(null);
         if(getUserById!=null){
             try {
-                User UpdatedUser = userService.updateUser(user);
+                if(user.getRoles()!=null){
+                    Set<Role> newRoles = new HashSet<>();
+                    for (String roleName : user.getRoles()) {
+                        Role existingRole = roleService.findByName(roleName);
+                        if (existingRole != null) {
+                            newRoles.add(existingRole);
+                        }
+                    }
+                    getUserById.setRoles(newRoles);
+                }
+                getUserById.setNama(user.getNama());
+                getUserById.setPassword(user.getPassword());
+                getUserById.setEmail(user.getEmail());
+                User UpdatedUser = userService.updateUser(getUserById);
                 dataResponse.setPayload(userService.updateUser(UpdatedUser));
                 dataResponse.setStatus(true);
                 dataResponse.getMessages().add("berhasil");
